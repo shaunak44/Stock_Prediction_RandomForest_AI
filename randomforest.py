@@ -26,7 +26,7 @@ class RandomForest():
 def std_agg(cnt, s1, s2): return math.sqrt((s2/cnt) - (s1/cnt)**2)
 
 class DecisionTree():
-    def __init__(self, x, y, n_features, f_idxs,idxs,depth=10, min_leaf=5):
+    def __init__(self, x, y, n_features, f_idxs, idxs, depth=10, min_leaf=5):
         self.x, self.y, self.idxs, self.min_leaf, self.f_idxs = x, y, idxs, min_leaf, f_idxs
         self.depth = depth
         #print(f_idxs)
@@ -53,7 +53,7 @@ class DecisionTree():
         sort_idx = np.argsort(x)
         sort_y,sort_x = y[sort_idx], x[sort_idx]
         rhs_cnt,rhs_sum,rhs_sum2 = self.n, sort_y.sum(), (sort_y**2).sum()
-        lhs_cnt,lhs_sum,lhs_sum2 = 0,0.,0.
+        lhs_cnt,lhs_sum,lhs_sum2 = 0, 0., 0.
 
         for i in range(0,self.n-self.min_leaf-1):
             xi,yi = sort_x[i],sort_y[i]
