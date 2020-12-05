@@ -88,8 +88,9 @@ class DecisionTree():
         return t.predict_row(xi)
 
 import pandas as pd
-dataset = pd.read_csv('dataset.csv', usecols=['Open', 'Close', 'High', 'Low', 'Adj Close'])
-x = dataset.iloc[:, :-2].values
+dataset = pd.read_csv('dataset.csv', usecols=['Date', 'Open', 'Close', 'High', 'Low', 'Adj Close'])
+dates = dataset.iloc[:, 0].values
+x = dataset.iloc[:, 1:-2].values
 y = dataset.iloc[:, -2].values
 
 #Normalization of Features i.e. Open High and Low values
@@ -120,3 +121,23 @@ rmse_score_percentage = rmse_score*100
 print("The percentage RMSE score is: ", rmse_score_percentage)
 print("The MAPE score is: ", mape_score)
 print("The MBE score is: ", mbe_score)
+
+import matplotlib.pyplot as plt
+plot_x = dates[200:]
+plot_orig_y, plot_pred_y = [], []
+for i in y_res:
+    plot_pred_y.append(i*15000)
+for i in y_test:
+    plot_orig_y.append(i*15000)
+plt.xlabel("Date")
+plt.ylabel("Price")
+plt.title('Closing price prediction')
+plt.plot(plot_x, plot_pred_y, marker='o', color="blue")
+plt.plot(plot_x, plot_orig_y, marker='o', color="red")
+ax = plt.gca()
+start, end = ax.get_xlim()
+stepsize = 10
+ax.xaxis.set_ticks(np.arange(start, end, stepsize))
+plt.show()
+#for i in range(len(plot_x)):
+#    print(plot_x[i], plot_pred_y[i])
