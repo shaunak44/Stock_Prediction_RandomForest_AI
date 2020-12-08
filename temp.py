@@ -1,5 +1,8 @@
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+import pandas as pd
+
 class RandomForest():
     def __init__(self, x, y, n_trees, n_features, sample_sz, depth=10, min_leaf=5):
         np.random.seed(12)
@@ -26,7 +29,7 @@ class RandomForest():
 def std_agg(cnt, s1, s2): return math.sqrt((s2/cnt) - (s1/cnt)**2)
 
 class DecisionTree():
-    def __init__(self, x, y, n_features, f_idxs, idxs, depth=10, min_leaf=5):
+    def __init__(self, x, y, n_features, f_idxs,idxs,depth=10, min_leaf=5):
         self.x, self.y, self.idxs, self.min_leaf, self.f_idxs = x, y, idxs, min_leaf, f_idxs
         self.depth = depth
         #print(f_idxs)
@@ -53,7 +56,7 @@ class DecisionTree():
         sort_idx = np.argsort(x)
         sort_y,sort_x = y[sort_idx], x[sort_idx]
         rhs_cnt,rhs_sum,rhs_sum2 = self.n, sort_y.sum(), (sort_y**2).sum()
-        lhs_cnt,lhs_sum,lhs_sum2 = 0, 0., 0.
+        lhs_cnt,lhs_sum,lhs_sum2 = 0,0.,0.
 
         for i in range(0,self.n-self.min_leaf-1):
             xi,yi = sort_x[i],sort_y[i]
@@ -86,14 +89,18 @@ class DecisionTree():
         if self.is_leaf: return self.val
         t = self.lhs if xi[self.var_idx]<=self.split else self.rhs
         return t.predict_row(xi)
+        
+        
 
-import pandas as pd
 dataset = pd.read_csv('dataset.csv', usecols=['Date', 'Open', 'Close', 'High', 'Low', 'Adj Close'])
+no_of_records = len(dataset.index)
+temp_close_list = dataset['Close']
+temp_close_list = temp_close_list.shift(periods=-1, fill_value=15000)
+dataset['Next_Close'] = [temp_close_list[i] for i in range(len(temp_close_list))]
+dataset = dataset.sample(frac=1)
 dates = dataset.iloc[:, 0].values
 x = dataset.iloc[:, 1:-2].values
 y = dataset.iloc[:, -2].values
-
-print(dataset.iloc[:, -2 ])
 
 #Normalization of Features i.e. Open High and Low values
 for i in range(len(x)):
@@ -112,7 +119,6 @@ rmse_score = 0
 mape_score = 0
 mbe_score = 0
 for i in range(len(y_test)):
-    #print(y_res[i], y_test[i])
     rmse_score = rmse_score + ((y_test[i]-y_res[i])**2)
     mape_score = mape_score + ((y_test[i]-y_res[i])/y_test[i])
     mbe_score = mbe_score + (y_test[i]-y_res[i])
@@ -124,7 +130,6 @@ print("The percentage RMSE score is: ", rmse_score_percentage)
 print("The MAPE score is: ", mape_score)
 print("The MBE score is: ", mbe_score)
 
-import matplotlib.pyplot as plt
 plot_x = dates[200:]
 plot_orig_y, plot_pred_y = [], []
 for i in y_res:
@@ -141,5 +146,3 @@ start, end = ax.get_xlim()
 stepsize = 10
 ax.xaxis.set_ticks(np.arange(start, end, stepsize))
 plt.show()
-#for i in range(len(plot_x)):
-#    print(plot_x[i], plot_pred_y[i])
